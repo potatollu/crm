@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.TakeGiftItemMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.TakeGiftItem">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="number" jdbcType="VARCHAR" property="number" />
+    <result column="clientName" jdbcType="VARCHAR" property="clientName" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="unit" jdbcType="VARCHAR" property="unit" />
+    <result column="takeNum" jdbcType="INTEGER" property="takeNum" />
+    <result column="needIntegral" jdbcType="BIGINT" property="needIntegral" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from takegiftitem
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.liqinxu.crm.domain.TakeGiftItem" useGeneratedKeys="true">
+    insert into takegiftitem (number, clientName, name, 
+      unit, takeNum, needIntegral
+      )
+    values (#{number,jdbcType=VARCHAR}, #{clientName,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{unit,jdbcType=VARCHAR}, #{takeNum,jdbcType=INTEGER}, #{needIntegral,jdbcType=BIGINT}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.liqinxu.crm.domain.TakeGiftItem">
+    update takegiftitem
+    set number = #{number,jdbcType=VARCHAR},
+      clientName = #{clientName,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      unit = #{unit,jdbcType=VARCHAR},
+      takeNum = #{takeNum,jdbcType=INTEGER},
+      needIntegral = #{needIntegral,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, number, clientName, name, unit, takeNum, needIntegral
+    from takegiftitem
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, number, clientName, name, unit, takeNum, needIntegral
+    from takegiftitem
+  </select>
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.PermissionMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Permission">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="resource" property="resource"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM permission
+        WHERE id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO permission (name, resource)
+        VALUES (#{name}, #{resource})
+    </insert>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            id,
+            name,
+            resource
+        FROM permission
+        WHERE id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            id,
+            name,
+            resource
+        FROM permission
+    </select>
+
+    <select id="queryForCount" resultType="int">
+        SELECT count(id)
+        FROM permission
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        SELECT
+            id,
+            name,
+            resource
+        FROM permission
+        LIMIT #{start}, #{rows}
+    </select>
+    <select id="selectAllPermission" resultType="string">
+        SELECT name
+        FROM permission
+    </select>
+
+    <select id="selectByRoleId" resultType="permission">
+        SELECT
+            p.id,
+            p.name,
+            p.resource
+        FROM role_permission rp
+            JOIN permission p ON rp.permission_id = p.id
+        WHERE rp.role_id = #{roleId}
+    </select>
+    <select id="selectRolesByEmpId" resultType="string">
+        SELECT p.resource
+        FROM employee_role er
+            JOIN role r ON er.role_id = r.id
+            JOIN role_permission rp ON er.role_id = rp.role_id
+            JOIN permission p ON rp.permission_id = p.id
+        WHERE er.employee_id = #{employeeId}
+    </select>
+</mapper>

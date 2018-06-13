@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.StockTakingMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.StockTaking">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="productSn"  property="productSn" />
+    <result column="productName"  property="productName" />
+    <result column="dirName"  property="dirName" />
+    <result column="totalNumber"  property="totalNumber" />
+    <result column="depotName"  property="depotName" />
+    <result column="takeTime" jdbcType="DATE" property="takeTime" />
+    <result column="employeeName"  property="employeeName" />
+    <result column="supplierName"  property="supplierName" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from stocktaking
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id"  useGeneratedKeys="true">
+    insert into stocktaking (productSn, productName, dirName, supplierName,
+      totalNumber, depotName, takeTime, 
+      employeeName)
+    values (#{productSn}, #{productName}, #{dirName} ,#{supplierName} ,
+      #{totalNumber}, #{depotName}, #{takeTime},
+      #{employeeName})
+  </insert>
+  <update id="updateByPrimaryKey" >
+    update stocktaking
+    set productSn = #{productSn},
+    productName = #{productName},
+    dirName = #{dirName},
+    totalNumber = #{totalNumber},
+    depotName = #{depotName},
+    takeTime = #{takeTime},
+    employeeName = #{employeeName},
+    supplierName = #{supplierName}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, productSn, productName, dirName, totalNumber, depotName, takeTime, employeeName, supplierName
+    from stocktaking
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, productSn, productName, dirName, totalNumber, depotName, takeTime, employeeName, supplierName
+    from stocktaking
+  </select>
+  <select id="queryCount" resultType="int">
+    SELECT count(id)
+    FROM stocktaking
+    <include refid="base_where"/>
+  </select>
+
+  <select id="queryList" resultMap="BaseResultMap">
+    SELECT id, productSn, productName, dirName, totalNumber, depotName, takeTime, employeeName, supplierName
+    FROM stocktaking
+    <include refid="base_where"/>
+    LIMIT #{start}, #{rows}
+  </select>
+    <select id="changStockTaking" resultType="com.liqinxu.crm.domain.StockTaking">
+    SELECT id, productSn, productName, dirName, totalNumber, depotName, takeTime, employeeName, supplierName
+    FROM stocktaking
+    WHERE productName=#{productName} and depotName=#{depotName}
+    </select>
+    <sql id="base_where">
+    <where>
+      <if test="keyWord != null and keyWord != ''">
+      and dirName like concat('%',#{keyWord},'%')
+      </if>
+    </where>
+  </sql>
+</mapper>

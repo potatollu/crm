@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.MenuMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Menu">
+        <id column="id" property="id"/>
+        <result column="text" property="text"/>
+        <result column="url" property="url"/>
+        <association property="permission" column="permission_id" javaType="permission"
+                     select="com.liqinxu.crm.mapper.PermissionMapper.selectByPrimaryKey" fetchType="eager"/>
+        <collection property="children" column="id" ofType="menu" select="selectChildMenu" fetchType="eager"/>
+    </resultMap>
+
+    <!--查询根菜单-->
+    <select id="selectRootMenu" resultMap="BaseResultMap">
+        SELECT *
+        FROM menu
+        WHERE parent_id IS NULL
+    </select>
+    <!--查询子菜单-->
+    <select id="selectChildMenu" resultMap="BaseResultMap">
+        SELECT *
+        FROM menu
+        WHERE parent_id = #{id}
+    </select>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM menu
+        WHERE id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO menu (text, url, parent_id)
+        VALUES (#{text}, #{url}, #{children.id})
+    </insert>
+    <update id="updateByPrimaryKey">
+        UPDATE menu
+        SET text      = #{text},
+            url       = #{url},
+            parent_id = #{children.id}
+        WHERE id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            id,
+            text,
+            url,
+            parent_id
+        FROM menu
+        WHERE id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            id,
+            text,
+            url,
+            parent_id
+        FROM menu
+    </select>
+
+    <select id="queryForCount" resultType="int">
+        SELECT count(id)
+        FROM menu
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        SELECT
+            id,
+            text,
+            url,
+            parent_id
+        FROM menu
+        LIMIT #{start}, #{rows}
+    </select>
+
+</mapper>

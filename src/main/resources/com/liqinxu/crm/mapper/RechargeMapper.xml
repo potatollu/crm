@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.RechargeMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Recharge">
+    <id column="id" property="id" />
+    <result column="operationType" property="operationType" />
+    <result column="payBeforeNum" property="payBeforeNum" />
+    <result column="payAfterNum" property="payAfterNum" />
+    <result column="fund" property="fund" />
+    <result column="sendNumber" property="sendNumber" />
+    <result column="validTime" property="validTime" />
+    <result column="remark" property="remark" />
+    <!--关联会员对象-->
+    <association property="member" javaType="member" column="member_id" fetchType="eager"
+                 select="com.liqinxu.crm.mapper.MemberMapper.selectByPrimaryKey"/>
+    <!--关联支付对象-->
+    <association property="paymode" javaType="payMode" fetchType="eager" column="paymode_id"
+                 select="com.liqinxu.crm.mapper.PayModeMapper.selectByPrimaryKey"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from recharge
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into recharge (member_id, operationType, paymode_id, payBeforeNum, payAfterNum, 
+      fund, sendNumber, validTime, remark)
+    values (#{member.id}, #{operationType}, #{paymode.id}, #{payBeforeNum}, #{payAfterNum}, 
+      #{fund}, #{sendNumber}, #{validTime}, #{remark})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update recharge
+    set member_id = #{member.id},
+      operationType = #{operationType},
+      paymode_id = #{paymode.id},
+      payBeforeNum = #{payBeforeNum},
+      payAfterNum = #{payAfterNum},
+      fund = #{fund},
+      sendNumber = #{sendNumber},
+      validTime = #{validTime},
+      remark = #{remark}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, member_id, operationType, paymode_id, payBeforeNum, payAfterNum, fund, 
+    sendNumber, validTime, remark
+    from recharge
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, member_id, operationType, paymode_id, payBeforeNum, payAfterNum, fund, 
+    sendNumber, validTime, remark
+    from recharge
+  </select>
+  <select id="queryForCount" resultType="int">
+    SELECT count(id)
+    FROM recharge
+  </select>
+
+  <select id="queryForList" resultMap="BaseResultMap">
+    select id, member_id, operationType, paymode_id, payBeforeNum, payAfterNum, fund,
+    sendNumber, validTime, remark
+    FROM recharge
+    LIMIT #{start}, #{rows}
+  </select>
+  <select id="selectByNumber" resultType="recharge">
+     select r.payBeforeNum,r.payAfterNum from recharge r join member mem on r.member_id = mem.id
+       where mem.number = #{number}
+  </select>
+</mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.IntegralChangeMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.IntegralChange">
+    <id column="id" property="id" />
+    <result column="memberNumber" property="memberNumber" />
+    <result column="memberName"  property="memberName" />
+    <result column="grade"  property="grade" />
+    <result column="changeType"  property="changeType" />
+    <result column="amount"  property="amount" />
+    <result column="chaneTime" jdbcType="DATE" property="chaneTime" />
+    <result column="remark"  property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" >
+    delete from integralchange
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id"  useGeneratedKeys="true">
+    insert into integralchange (memberNumber, memberName, grade, 
+      changeType, amount, chaneTime, 
+      remark)
+    values (#{memberNumber}, #{memberName}, #{grade}, 
+      #{changeType}, #{amount}, #{chaneTime}, 
+      #{remark})
+  </insert>
+  <update id="updateByPrimaryKey" >
+    update integralchange
+    set memberNumber = #{memberNumber},
+      memberName = #{memberName},
+      grade = #{grade},
+      changeType = #{changeType},
+      amount = #{amount},
+      chaneTime = #{chaneTime},
+      remark = #{remark}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey"  resultMap="BaseResultMap">
+    select id, memberNumber, memberName, grade, changeType, amount, chaneTime, remark
+    from integralchange
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, memberNumber, memberName, grade, changeType, amount, chaneTime, remark
+    from integralchange
+  </select>
+  <select id="queryCount" resultType="int" >
+    select count(id)
+    from integralchange
+    <include refid="base_where"/>
+  </select>
+  <select id="queryList" resultMap="BaseResultMap">
+    select id, memberNumber, memberName, grade, changeType, amount, chaneTime, remark
+    from integralchange
+    <include refid="base_where"/>
+    limit #{start},#{rows}
+  </select>
+  <sql id="base_where">
+    <where>
+      <if test="keyWord != null and keyWord != ''">
+        and (memberNumber like concat('%',#{keyWord},'%') or memberName like concat('%',#{keyWord},'%'))
+      </if>
+    </where>
+  </sql>
+</mapper>

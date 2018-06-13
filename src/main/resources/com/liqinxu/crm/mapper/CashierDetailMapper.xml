@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.CashierDetailMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.CashierDetail">
+        <result column="state" property="state"/>
+        <association column="member_id" fetchType="eager" javaType="member" property="member"
+                     select="com.liqinxu.crm.mapper.MemberMapper.selectByPrimaryKey"/>
+        <association column="product_id" fetchType="eager" javaType="product" property="product"
+                     select="com.liqinxu.crm.mapper.ProductMapper.selectByPrimaryKey"/>
+        <association column="cashierDetailProduct_id" fetchType="eager" javaType="cashierDetailProduct"
+                     property="cashierDetailProduct"
+                     select="com.liqinxu.crm.mapper.CashierDetailProductMapper.selectByPrimaryKey"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM cashierdetail
+        WHERE id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO cashierdetail (member_id, product_id, state, cashierDetailProduct_id)
+        VALUES (#{member.id}, #{product.id}, #{state}, #{cashierDetailProduct.id})
+    </insert>
+    <update id="updateByPrimaryKey">
+        UPDATE cashierdetail
+        SET member_id               = #{member.id},
+            product_id              = #{product.id},
+            state                   = #{state},
+            cashierDetailProduct_id = #{cashierDetailProduct.id}
+        WHERE id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            id,
+            member_id,
+            product_id,
+            state,
+            cashierDetailProduct_id
+        FROM cashierdetail
+        WHERE id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            id,
+            member_id,
+            product_id,
+            state,
+            cashierDetailProduct_id
+        FROM cashierdetail
+    </select>
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.GiftMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Gift">
+    <id column="id"  property="id" />
+    <result column="sn"  property="sn" />
+    <result column="name"  property="name" />
+    <result column="unit"  property="unit" />
+    <result column="integral"  property="integral" />
+    <result column="number"  property="number" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from gift
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into gift (sn, name, unit, 
+      integral, number)
+    values (#{sn}, #{name}, #{unit}, 
+      #{integral}, #{number})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update gift
+    set sn = #{sn},
+      name = #{name},
+      unit = #{unit},
+      integral = #{integral},
+      number = #{number}
+    where id = #{id}
+  </update>
+    <update id="updateCurrentNum">
+        update gift  set
+      number = #{number}
+    where id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, sn, name, unit, integral, number
+    from gift
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, sn, name, unit, integral, number
+    from gift
+  </select>
+  <select id="queryCount" resultType="int" >
+    select count(id)
+    from gift
+    <include refid="base_where"/>
+  </select>
+  <select id="queryList" resultMap="BaseResultMap">
+    select id, sn, name, unit, integral, number
+    from gift
+    <include refid="base_where"/>
+    limit #{start},#{rows}
+  </select>
+    <select id="queryAll" resultType="com.liqinxu.crm.domain.Gift">
+    select id, sn, name, unit, integral, number
+    from gift
+    </select>
+    <sql id="base_where">
+    <where>
+      <if test="keyWord != null and keyWord != ''">
+        and name like concat('%',#{keyWord},'%')
+      </if>
+    </where>
+  </sql>
+</mapper>

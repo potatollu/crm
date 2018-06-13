@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.SystemLogMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.SystemLog">
+        <id column="id" property="id"/>
+        <result column="opTime" property="opTime"/>
+        <result column="opIP" property="opIP"/>
+        <result column="params" property="params"/>
+        <result column="function" property="function"/>
+        <collection property="employee" ofType="Employee" fetchType="eager">
+            <id column="employee_id" property="id"/>
+            <result column="username" property="username"/>
+        </collection>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM systemlog
+        WHERE id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO systemlog (opTime, opIP, employee_id, params, function)
+        VALUES (#{opTime}, #{opIP}, #{employee.id}, #{params}, #{function})
+    </insert>
+    <update id="updateByPrimaryKey">
+        UPDATE systemlog
+        SET opTime      = #{opTime},
+            opIP        = #{opIP},
+            employee_id = #{employee.id},
+            params      = #{params},
+            function    = #{function}
+        WHERE id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+        s.id,
+        s.opTime,
+        s.opIP,
+        e.username,
+        s.params,
+        function
+        FROM systemlog s
+        join employee e
+        on s.employee_id = e.id
+        WHERE id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        s.id,
+        s.opTime,
+        s.opIP,
+        e.username,
+        s.params,
+        function
+        FROM systemlog s
+        join employee e
+        on s.employee_id = e.id
+    </select>
+    <select id="queryForCount" resultType="int">
+        SELECT count(id)
+        FROM systemlog
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        SELECT
+        s.id,
+        s.opTime,
+        s.opIP,
+        e.username,
+        s.params,
+        function
+        FROM systemlog s
+        join employee e
+        on s.employee_id = e.id
+        LIMIT #{start}, #{rows}
+    </select>
+</mapper>

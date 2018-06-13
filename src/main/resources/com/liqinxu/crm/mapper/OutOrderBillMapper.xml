@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.liqinxu.crm.mapper.OutOrderBillMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.OutOrderBill">
+        <id column="id" property="id"/>
+        <result column="sn" property="sn"/>
+        <result column="vdate" property="vdate"/>
+        <result column="status" property="status"/>
+        <result column="totalAmount" property="totalAmount"/>
+        <result column="totalNumber" property="totalNumber"/>
+        <result column="auditTime" property="auditTime"/>
+        <result column="inputTime" property="inputTime"/>
+        <result column="remark" property="remark"/>
+        <association property="inputUser" javaType="com.liqinxu.crm.domain.Employee" columnPrefix="inputUser_">
+            <id column="id" property="id"/>
+            <result column="username" property="username"/>
+        </association>
+        <association property="auditor" javaType="com.liqinxu.crm.domain.Employee" columnPrefix="auditor_">
+            <id column="id" property="id"/>
+            <result column="username" property="username"/>
+        </association>
+        <association property="supplier" javaType="com.liqinxu.crm.domain.Supplier" columnPrefix="supplier_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+        <association property="depot" javaType="com.liqinxu.crm.domain.Depot" columnPrefix="depot_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+        <collection property="items" ofType="com.liqinxu.crm.domain.OutOrderBillItem" fetchType="eager"
+                    select="com.liqinxu.crm.mapper.OutOrderBillItemMapper.selectByBillId" column="id"></collection>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM `outorderBill`
+        WHERE id = #{id}
+    </delete>
+    <insert id="insert" parameterType="com.liqinxu.crm.domain.OutOrderBill" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `outorderBill` (sn, vdate, status, totalAmount, totalNumber, auditTime,
+                                 inputTime, inputUser_id, auditor_id, supplier_id , remark,depot_id)
+        VALUES (#{sn}, #{vdate}, #{status}, #{totalAmount}, #{totalNumber}, #{auditTime},
+        #{inputTime}, #{inputUser.id}, #{auditor.id}, #{supplier.id}, #{remark} ,#{depot.id})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.liqinxu.crm.domain.OutOrderBill">
+        UPDATE `outorderBill`
+        SET sn = #{sn},
+        vdate = #{vdate},
+        remark = #{remark},
+        totalAmount = #{totalAmount},
+        totalNumber = #{totalNumber},
+        supplier_id = #{supplier.id},
+        depot_id = #{depot.id}
+        WHERE id = #{id}
+    </update>
+    <update id="audit">
+        UPDATE outorderBill
+        SET status =#{status},auditor_id=#{auditor.id},auditTime=#{auditTime},depot_id=#{depot.id} where id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+            ob.id,
+            ob.sn,
+            ob.vdate,
+            ob.status,
+            ob.totalAmount,
+            ob.totalNumber,
+            ob.auditTime,
+            ob.inputTime,
+            ob.remark,
+            ob.inputUser_id,
+            ob.auditor_id,
+            ob.supplier_id,
+            supplier.id   supplier_id,
+            supplier.name supplier_name,
+            depot.id depot_id,
+             depot.name depot_name
+        FROM `outorderBill` ob
+         LEFT JOIN supplier supplier ON supplier.id=ob.supplier_id
+          LEFT JOIN depot depot ON depot.id=ob.depot_id
+        WHERE ob.id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            id,
+            sn,
+            vdate,
+            status,
+            totalAmount,
+            totalNumber,
+            remark,
+            auditTime,
+            inputTime,
+            inputUser_id,
+            auditor_id,
+            supplier_id,
+        FROM `outorderBill`
+    </select>
+    <select id="queryForCount" resultType="java.lang.Integer">
+        SELECT count(ob.id)
+        FROM outorderBill ob
+        LEFT JOIN supplier supplier ON ob.supplier_id = supplier.id
+        LEFT JOIN employee inputUser on ob.inputUser_id = inputUser.id
+        LEFT JOIN employee auditor on ob.auditor_id = auditor.id
+        LEFT JOIN depot  depot on  ob.depot_id = depot.id
+    </select>
+    <select id="queryForList" resultMap="BaseResultMap">
+    SELECT
+      ob.id,
+      ob.sn,
+      ob.vdate,
+      ob.status,
+      ob.totalAmount,
+      ob.totalNumber,
+      ob.auditTime,
+      ob.inputTime,
+      ob.remark,
+      supplier.id supplier_id,
+      supplier.name supplier_name,
+      auditor.id auditor_id,
+      auditor.username auditor_username,
+      inputUser.id inputUser_id,
+      inputUser.username inputUser_username,
+      depot.id depot_id,
+      depot.name depot_name
+    FROM outorderBill ob
+    LEFT JOIN supplier supplier ON ob.supplier_id = supplier.id
+    LEFT JOIN employee inputUser on ob.inputUser_id = inputUser.id
+    LEFT JOIN employee auditor on ob.auditor_id = auditor.id
+    LEFT JOIN depot  depot on  ob.depot_id = depot.id
+    limit #{start},#{rows}
+  </select>
+    <select id="listAll" resultMap="BaseResultMap">
+    SELECT
+      ob.id,
+      ob.sn,
+      ob.vdate,
+      ob.status,
+      ob.totalAmount,
+      ob.totalNumber,
+      ob.auditTime,
+      ob.inputTime,
+      ob.remark,
+      supplier.id supplier_id,
+      supplier.name supplier_name,
+      auditor.id auditor_id,
+      auditor.username auditor_username,
+      inputUser.id inputUser_id,
+      inputUser.username inputUser_username,
+      depot.id depot_id,
+      depot.name depot_name
+    FROM outorderBill ob
+    LEFT JOIN supplier supplier ON ob.supplier_id = supplier.id
+    LEFT JOIN employee inputUser on ob.inputUser_id = inputUser.id
+    LEFT JOIN employee auditor on ob.auditor_id = auditor.id
+    LEFT JOIN depot  depot on  ob.depot_id = depot.id
+    </select>
+    <sql id="conditions_sql">
+        <where>
+
+            <if test="beginDate!=null">
+                and ob.vdate >= #{beginDate}
+            </if>
+            <if test="endDate!=null">
+                and ob.vdate &lt;= #{endDate}
+            </if>
+            <if test="supplierId>0">
+                and ob.supplier_id=#{supplierId}
+            </if>
+            <if test="status>=0">
+                and ob.status=#{status}
+            </if>
+        </where>
+    </sql>
+</mapper>

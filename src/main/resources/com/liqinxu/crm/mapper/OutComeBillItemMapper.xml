@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.OutComeBillItemMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.OutComeBillItem">
+    <id column="id" property="id" />
+    <result column="outMoney" property="outMoney" />
+    <result column="outputTime" property="outputTime" />
+    <result column="remark" property="remark" />
+    <association property="outputUser" javaType="Employee" column="outputUser_id" fetchType="eager"
+                 select="com.liqinxu.crm.mapper.EmployeeMapper.selectByPrimaryKey"/>
+    <association property="outType" javaType="OutComeType" column="outType_id" fetchType="eager"
+                 select="com.liqinxu.crm.mapper.OutComeTypeMapper.selectByPrimaryKey"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from outcomebillitem
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into outcomebillitem (outType_id, outMoney, outputTime, outputUser_id, remark)
+    values (#{outType.id}, #{outMoney}, #{outputTime}, #{outputUser.id}, #{remark})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update outcomebillitem
+    set outType_id = #{outType.id},
+      outMoney = #{outMoney},
+      outputTime = #{outputTime},
+      outputUser_id = #{outputUser.id},
+      remark = #{remark}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, outType_id, outMoney, outputTime, outputUser_id, remark
+    from outcomebillitem
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, outType_id, outMoney, outputTime, outputUser_id, remark
+    from outcomebillitem
+  </select>
+
+
+  <select id="queryForCount" resultType="int">
+    SELECT count(id)
+    FROM outcomebillitem
+    <include refid="base_where"/>
+  </select>
+
+  <select id="queryForList" resultMap="BaseResultMap">
+    select id, outType_id, outMoney, outputTime, outputUser_id, remark
+    from outcomebillitem
+    <include refid="base_where"/>
+    LIMIT #{start}, #{rows}
+  </select>
+
+  <sql id="base_where">
+    <where>
+      <if test="beginDate!=null">
+        and outputTime &gt;= #{beginDate}
+      </if>
+      <if test="endDate!=null">
+        and outputTime &lt;= #{endDate}
+      </if>
+    </where>
+  </sql>
+
+
+  <select id="selectOutChart" resultType="map">
+    select oc.name OcName,sum(item.outMoney) totalAmount from outcomebillitem item join outcometype oc
+    on item.outType_id=oc.id
+    group by oc.name
+  </select>
+
+</mapper>

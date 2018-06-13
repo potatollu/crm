@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.DepotMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Depot">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="sn" jdbcType="VARCHAR" property="sn" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="adress" jdbcType="VARCHAR" property="adress" />
+
+    <association property="manager" javaType="com.liqinxu.crm.domain.Employee" columnPrefix="manager_">
+      <id property="id" column="id"/>
+      <result property="username" column="username"/>
+      <result property="realname" column="realname"/>
+    </association>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from depot
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.liqinxu.crm.domain.Depot" useGeneratedKeys="true">
+    insert into depot (name, sn, phone, 
+      manager_id, adress)
+    values (#{name}, #{sn}, #{phone}, 
+      #{manager.id}, #{adress})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.liqinxu.crm.domain.Depot">
+    update depot
+    set name = #{name},
+      sn = #{sn},
+      phone = #{phone},
+      manager_id = #{manager.id},
+      adress = #{adress}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, name, sn, phone, manager_id, adress
+    from depot
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, name, sn, phone, manager_id, adress
+    from depot
+  </select>
+  <select id="queryForCount" resultType="java.lang.Integer">
+    select count(d.id)
+    from depot d
+  </select>
+  <select id="queryForList" resultMap="BaseResultMap">
+    SELECT
+      d.id,
+      d.name,
+      d.sn,
+      d.phone,
+      d.adress,
+      e.id manager_id,
+      e.username manager_username,
+      e.realname manager_realname
+    FROM depot d
+    JOIN employee e ON d.manager_id = e.id
+    limit #{start},#{rows}
+  </select>
+</mapper>

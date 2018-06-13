@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.MemberMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Member">
+    <id column="id" property="id" />
+    <result column="number" property="number" />
+    <result column="name" property="name" />
+    <result column="password" property="password" />
+    <result column="tel" property="tel" />
+    <result column="sex" property="sex" />
+    <result column="dicitionary_id" property="dicitionary_id" />
+    <result column="qq" property="qq" />
+    <result column="wechat" property="wechat" />
+    <result column="email" property="email" />
+    <result column="birthday" property="birthday" />
+    <result column="integral" property="integral" />
+    <result column="balance" property="balance" />
+    <result column="site" property="site" />
+    <result column="totalCost" property="totalCost" />
+    <!--关联会员分组-->
+    <association property="group" javaType="grouping" column="id"
+                 select="com.liqinxu.crm.mapper.GroupingMapper.selectByMemberId" fetchType="eager" />
+    <!--关联会员等级-->
+    <association property="grade" javaType="grade" column="id" fetchType="eager"
+                 select="com.liqinxu.crm.mapper.GradeMapper.selectByMenberId"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from member
+    where id = #{id}
+  </delete>
+    <!--删除分组和会员中间表-->
+    <delete id="deleteGroupingAndMember">
+    delete from member_grouping where member_id = #{id}
+  </delete>
+    <!--删除等级和会员中间表-->
+    <delete id="deleteGradeAndMember">
+      delete from member_grade where member_id = #{id}
+  </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into member (number, name, password, tel, sex, dicitionary_id,  qq, wechat, email, birthday,integral,balance,site)
+    values (#{number}, #{name}, #{password}, #{tel}, #{sex}, #{dicitionary_id}, #{qq}, #{wechat}, #{email}, #{birthday},#{integral},0,#{site})
+  </insert>
+    <!--保存分组和会员中间表-->
+    <insert id="insertGroupingAndMember">
+     insert into member_grouping (member_id, grouping_id) values(#{memberId},#{groupingId})
+  </insert>
+    <!--保存等级和会员中间表-->
+    <insert id="insertGradeAndMember">
+      insert into member_grade (member_id, grade_id) value(#{memberId},#{gradeId})
+  </insert>
+    <update id="updateByPrimaryKey">
+    update member
+    set number = #{number},
+      name = #{name},
+      password = #{password},
+      tel = #{tel},
+      sex = #{sex},
+      dicitionary_id = #{dicitionary_id},
+      qq = #{qq},
+      wechat = #{wechat},
+      email = #{email},
+      birthday = #{birthday},
+      integral = #{integral},
+      balance = #{balance},
+      site = #{site}
+    where id = #{id}
+  </update>
+  <!--修改会员积分-->
+  <update id="updateIntegralByNumber">
+    update member
+    set integral = #{newIntegral}
+    where number = #{memberNumber}
+  </update>
+  <!--修改余额-->
+  <update id="updateBalanceByNumber">
+      update member set balance = #{big}
+        where number = #{number}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, number, name, password,tel, sex, dicitionary_id, qq, wechat,
+    email, birthday,integral,balance,site
+    from member
+    where id = #{id}
+  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+    select id, number, name, password, tel,sex, dicitionary_id,  qq, wechat,
+    email, birthday,integral,balance,site
+    from member
+  </select>
+    <select id="queryForCount" resultType="int">
+        SELECT count(id)
+        FROM member
+        <include refid="base_sql"/>
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        select id, number, name, password,tel, sex, dicitionary_id, qq, wechat,
+        email, birthday,integral,balance,site
+        from member
+        <include refid="base_sql"/>
+        LIMIT #{start}, #{rows}
+    </select>
+    <select id="selectByMemberId" resultType="Long">
+     select g.id  from member_grade mg join grade g on mg.grade_id = g.id where member_id = #{memberId}
+  </select>
+  <select id="selectGroupByMemberId" resultType="long">
+    select g.id  from member_grouping mg join grouping g on mg.grouping_id = g.id where member_id = #{memberId}
+  </select>
+    <select id="selectByBirthday" resultType="int">
+    select COUNT(id) from member WHERE  DATE_FORMAT(birthday,'%Y-%m-%d')  = CURDATE()
+  </select>
+    <select id="selectBybirthdayByOver" resultType="int">
+    select COUNT(id) from member WHERE  DATE_FORMAT(birthday,'%Y-%m-%d')  &lt; CURDATE()
+  </select>
+    <select id="selectBybirthdayByMonth" resultType="int">
+    select COUNT(id) from member WHERE  DATE_FORMAT(birthday,'%Y-%m')  = DATE_FORMAT(CURDATE(),'%Y-%m')
+  </select>
+    <select id="selectByMemberCount" resultType="int">
+    SELECT COUNT(id) FROM member
+  </select>
+    <select id="selectByNumber" resultMap="BaseResultMap">
+        select * from member where number = #{number}
+    </select>
+    <select id="getMemberByNumber" resultType="com.liqinxu.crm.domain.Member">
+        select id, number, name, password,tel, sex, dicitionary_id, qq, wechat,
+    email, birthday,integral,balance,site
+    from member
+    where number = #{number}
+    </select>
+    <select id="totalCost" resultType="java.lang.Object">
+       select sum(c.payMoney) totalCost
+        from member m
+        join member_grade mg on m.id = mg.member_id
+        join grade g on mg.grade_id = g.id
+        JOIN consumptiondetail c ON c.member_id = m.id
+        WHERE m.number = #{number}
+    </select>
+
+  <!--根据卡号/会员名查询会员信息-->
+  <select id="selectMemberByMessage" resultMap="BaseResultMap">
+    select m.id, m.number, m.name, m.wechat,m.balance,g.name grade,birthday,integral,sum(c.payMoney) totalCost
+    from member m
+    join member_grade mg on m.id = mg.member_id
+    join grade g on mg.grade_id = g.id
+    JOIN consumptiondetail c ON c.member_id = m.id
+    WHERE m.number = #{message}
+    OR m.name = #{message}
+  </select>
+  <!--查询会员当前积分-->
+  <select id="selectIntegralNumber" resultType="int">
+    select integral
+    from member
+    where number = #{memberNumber}
+  </select>
+  <select id="selectBalanceByNumber" resultType="decimal">
+    select balance from member where number = #{number}
+  </select>
+
+  <sql id="base_sql">
+        <where>
+            <if test="keyword!=null">
+                (tel like concat("%",#{keyword},"%") or number like concat("%",#{keyword},"%") or name like
+                concat("%",#{keyword}))
+            </if>
+        </where>
+    </sql>
+</mapper>

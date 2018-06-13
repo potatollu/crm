@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.GroupingMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Grouping">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from group
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into group (name)
+    values (#{name})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update group
+    set name = #{name}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, name
+    from group
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, name
+    from group
+  </select>
+
+  <!--根据会员id查询分组信息-->
+  <select id="selectByMemberId" resultType="grouping">
+     select g.name from grouping g join member_grouping mg on  g.id = mg.grouping_id where mg.member_id = #{id}
+  </select>
+</mapper>

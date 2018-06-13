@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.DepartmentMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Department">
+        <id column="id" property="id"/>
+        <result column="sn" property="sn"/>
+        <result column="name" property="name"/>
+        <result column="state" property="state"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM department
+        WHERE id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO department (sn, name, state)
+        VALUES (#{sn}, #{name}, #{state})
+    </insert>
+    <update id="updateByPrimaryKey">
+        UPDATE department
+        SET sn    = #{sn},
+            name  = #{name},
+            state = #{state}
+        WHERE id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            id,
+            sn,
+            name,
+            state
+        FROM department
+        WHERE id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            id,
+            sn,
+            name,
+            state
+        FROM department
+    </select>
+
+    <select id="queryForCount" resultType="int">
+        SELECT count(id)
+        FROM department
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        SELECT
+            id,
+            sn,
+            name,
+            state
+        FROM department
+        LIMIT #{start}, #{rows}
+    </select>
+</mapper>

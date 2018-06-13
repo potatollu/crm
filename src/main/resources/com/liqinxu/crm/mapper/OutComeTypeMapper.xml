@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.OutComeTypeMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.OutComeType">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from outcometype
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into outcometype (name)
+    values (#{name})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update outcometype
+    set name = #{name}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, name
+    from outcometype
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, name
+    from outcometype
+  </select>
+</mapper>

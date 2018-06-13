@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.SupplierMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Supplier">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="tel" jdbcType="VARCHAR" property="tel" />
+    <result column="inputTime" jdbcType="DATE" property="inputTime" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="mark" jdbcType="VARCHAR" property="mark" />
+
+    <association property="inputUser" javaType="com.liqinxu.crm.domain.Employee" columnPrefix="inputUser_">
+      <id property="id" column="id"/>
+      <result property="username" column="username"/>
+      <result property="realname" column="realname"/>
+    </association>
+
+
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from supplier
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.liqinxu.crm.domain.Supplier" useGeneratedKeys="true">
+    insert into supplier (name, username, tel,inputTime, inputUser_id,address,mark)
+    values (#{name}, #{username}, #{tel},#{inputTime}, #{inputUser.id},#{address},#{mark})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.liqinxu.crm.domain.Supplier">
+    update supplier
+    set name = #{name},
+      username = #{username},
+      tel = #{tel},
+      inputTime = #{inputTime},
+      inputUser_id = #{inputUser.id},
+      address = #{address},
+      mark = #{mark}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, name, username, tel, inputTime, inputUser_id,address,mark
+    from supplier
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    SELECT
+      s.id,
+      s.name,
+      s.username,
+      s.tel,
+      s.inputTime,
+      s.address,
+      s.mark,
+      e.id inputUser_id,
+      e.username inputUser_username,
+      e.realname inputUser_realname
+    FROM supplier s
+    JOIN employee e ON  s.inputUser_id = e.id
+  </select>
+  <select id="queryForCount" resultType="java.lang.Integer">
+    select count(s.id)
+    from supplier s
+  </select>
+
+  <select id="queryForList" resultMap="BaseResultMap">
+    SELECT
+      s.id,
+      s.name,
+      s.username,
+      s.tel,
+      s.inputTime,
+      s.address,
+      s.mark,
+      e.id inputUser_id,
+      e.username inputUser_username,
+      e.realname inputUser_realname
+    FROM supplier s
+    JOIN employee e ON  s.inputUser_id = e.id
+    limit #{start},#{rows}
+  </select>
+</mapper>

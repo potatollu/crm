@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.ServeMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Serve">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="sn" property="sn"/>
+        <result column="price" property="price"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM serve
+        WHERE id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO serve (name, sn,price)
+        VALUES (#{name},#{sn}, #{price})
+    </insert>
+    <update id="updateByPrimaryKey">
+        UPDATE serve
+        SET name  = #{name},
+            sn  = #{sn},
+            price = #{price}
+        WHERE id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            id,
+            name,
+            sn,
+            price
+        FROM serve
+        WHERE id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            id,
+            name,
+            sn,
+            price
+        FROM serve
+    </select>
+    <select id="queryForCount" resultType="int">
+        SELECT count(id)
+        FROM serve
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        SELECT
+            id,
+            name,
+            sn,
+            price
+        FROM serve
+        LIMIT #{start}, #{rows}
+    </select>
+    <select id="selectBySn" resultType="serve">
+        select * from serve where sn = #{sn}
+    </select>
+</mapper>

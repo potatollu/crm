@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.ProductMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.Product">
+    <id column="id" property="id" />
+    <result column=" name" property="name" />
+    <result column="sn" property="sn" />
+    <result column="salePrice" property="salePrice" />
+    <result column="costPrice" property="costPrice" />
+    <result column="vipPrice" property="vipPrice" />
+    <result column="credits" property="credits" />
+    <result column="intro" property="intro" />
+    <result column="imagePath" property="imagePath" />
+    <association property="productDir" column="dir_id" javaType="ProductDir" fetchType="eager"
+                 select="com.liqinxu.crm.mapper.ProductDirMapper.selectByPrimaryKey"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from product
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into product ( name, sn, salePrice, costPrice, vipPrice, credits, intro,
+      imagePath,dir_id)
+    values (#{ name}, #{sn}, #{salePrice}, #{costPrice}, #{vipPrice}, #{credits}, #{intro}, 
+      #{imagePath},#{productDir.id})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update product
+    set name = #{ name},
+      sn = #{sn},
+      salePrice = #{salePrice},
+      costPrice = #{costPrice},
+      vipPrice = #{vipPrice},
+      credits = #{credits},
+      intro = #{intro},
+      imagePath = #{imagePath},
+      dir_id = #{productDir.id}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, name, sn, salePrice, costPrice, vipPrice, credits, intro, imagePath, dir_id
+    from product
+    where id = #{id}
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+   select p.*,pd.id,pdr.id,pd.dirName,pdr.dirName from product p join productdir pd on p.dir_id = pd.id
+    join productdir pdr on pd.parent_id=pdr.id
+  </select>
+
+
+    <select id="queryForCount" resultType="int">
+        SELECT count(id)
+        FROM product
+        <include refid="where_sql"/>
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+    select id, name, sn, salePrice, costPrice, vipPrice, credits, intro, imagePath, dir_id
+    from product
+    <include refid="where_sql"/>
+        LIMIT #{start}, #{rows}
+    </select>
+
+  <sql id="where_sql">
+    <where>
+      <if test="keyword != null and keyword!= ''">
+        and (
+        name like concat('%',#{keyword},'%')
+        or sn like concat('%',#{keyword},'%')
+        )
+      </if>
+      <if test="secondId != null">
+        and dir_id = #{secondId}
+      </if>
+    </where>
+  </sql>
+
+  <!--通过商品id查询商品信息-->
+  <select id="selectRowByProductId" resultMap="BaseResultMap">
+      select pr.id, pr.dirName, pr.parent_id,
+      p.id, p.name, p.sn, p.salePrice, p.costPrice, p.vipPrice,
+      p.credits, p.intro, p.imagePath, p.dir_id from product p
+      join productdir pr on pr.id = p.dir_id where p.id=#{id}
+    <!--select id, name, sn, salePrice, costPrice, vipPrice, credits, intro, imagePath, dir_id
+    from product where id=#{id}-->
+  </select>
+   <update id="deleteRelation">
+       update product set dir_id is null where id = #{id}
+   </update>
+
+  <select id="selectTotalProduct" resultType="int">
+    select count(id) from product
+  </select>
+
+  <select id="selectSalePriceAvg" resultType="double">
+    select avg(salePrice) from product
+  </select>
+
+</mapper>

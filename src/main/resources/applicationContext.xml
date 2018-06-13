@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+
+">
+    <!--组件扫描器-->
+    <context:component-scan base-package="com.liqinxu.crm"/>
+    <!--开启DI注解扫描-->
+    <context:annotation-config/>
+    <!--保存日志的bean-->
+    <!--<bean id="logUtil" class="com.liqinxu.crm.util.SystemLogUtil"/>-->
+    <!--引入数据库配置文件-->
+    <context:property-placeholder location="classpath:db.properties" system-properties-mode="NEVER"/>
+    <!--配置数据库连接池-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <!--配置SqlSessionFactory-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--指定dataSources-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--指定mybatis配置文件-->
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+        <!--指定mapper.xml文件路径-->
+        <property name="mapperLocations" value="classpath:com/liqinxu/crm/mapper/*Mapper.xml"/>
+        <!--别名设置-->
+        <property name="typeAliasesPackage" value="com.liqinxu.crm.domain"/>
+    </bean>
+    <!--事务管理器-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--环绕增强-->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="get*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="list*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="query*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="select*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+    <!--aop配置-->
+    <aop:config>
+        <aop:pointcut id="txPointcut" expression="execution(* com.liqinxu.crm.service.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+        <!--<aop:aspect ref="logUtil">
+            <aop:after method="writelog" pointcut-ref="txPointcut"/>
+        </aop:aspect>-->
+    </aop:config>
+    <!--mapper接口扫描-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.liqinxu.crm.mapper"/>
+    </bean>
+</beans>

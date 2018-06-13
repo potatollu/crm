@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.MemberPayNumberMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.MemberPayNumber">
+        <id column="id" property="id"/>
+        <result column="validTime" property="validTime"/>
+        <result column="payTime" property="payTime"/>
+        <result column="remark" property="remark"/>
+        <result column="fund" property="fund"/>
+        <result column="payBeforeNum" property="payBeforeNum"/>
+        <result column="payAfterNum" property="payAfterNum"/>
+        <result column="payNumber" property="payNumber"/>
+        <association property="serve" javaType="serve" columnPrefix="s_" >
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+            <result column="sn" property="sn"/>
+            <result column="price" property="price"/>
+        </association>
+        <association property="member" javaType="member" columnPrefix="mem_" >
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+            <result column="balance" property="balance"/>
+            <result column="birthday" property="birthday"/>
+            <result column="email" property="email"/>
+            <result column="integral" property="integral"/>
+            <result column="number" property="number"/>
+            <result column="qq" property="qq"/>
+            <result column="sex" property="sex"/>
+            <result column="site" property="site"/>
+            <result column="tel" property="tel"/>
+            <result column="wechat" property="wechat"/>
+        </association>
+        <!--<association property="serve" javaType="serve" column="serve_id"
+                     select="com.liqinxu.crm.mapper.ServeMapper.selectByPrimaryKey" fetchType="eager"/>-->
+        <!--<association property="member" javaType="member" column="member_id"
+                     select="com.liqinxu.crm.mapper.MemberMapper.selectByPrimaryKey" fetchType="eager"/>-->
+        <association property="paymode" javaType="payMode" column="paymode_id"
+                     select="com.liqinxu.crm.mapper.PayModeMapper.selectByPrimaryKey" fetchType="eager"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM memberpaynumber
+        WHERE id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO memberpaynumber (member_id, serve_id, payNumber, validTime, payTime, remark,
+                                     fund, paymode_id, payBeforeNum, payAfterNum)
+        VALUES (#{member.id}, #{serve.id}, #{payNumber}, #{validTime}, #{payTime}, #{remark},
+                #{fund}, #{paymode.id}, #{payBeforeNum}, #{payAfterNum})
+    </insert>
+    <update id="updateByPrimaryKey">
+        UPDATE memberpaynumber
+        SET member_id    = #{member.id},
+            serve_id     = #{serve.id},
+            payNumber    = #{payNumber},
+            validTime    = #{validTime},
+            payTime      = #{payTime},
+            remark       = #{remark},
+            fund         = #{fund},
+            paymode_id   = #{paymode.id},
+            payBeforeNum = #{payBeforeNum},
+            payAfterNum  = #{payAfterNum}
+        WHERE id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            id,
+            member_id,
+            serve_id,
+            payNumber,
+            validTime,
+            payTime,
+            remark,
+            fund,
+            paymode_id,
+            payBeforeNum,
+            payAfterNum
+        FROM memberpaynumber
+        WHERE id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            id,
+            member_id,
+            serve_id,
+            payNumber,
+            validTime,
+            payTime,
+            remark,
+            fund,
+            paymode_id,
+            payBeforeNum,
+            payAfterNum
+        FROM memberpaynumber
+    </select>
+
+    <select id="queryForCount" resultType="int">
+        SELECT count(id)
+        FROM memberpaynumber
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        SELECT
+            m.id,
+            m.member_id,
+            m.serve_id,
+            m.payNumber,
+            m.validTime,
+            m.payTime,
+            m.remark,
+            m.fund,
+            m.paymode_id,
+            m.payBeforeNum,
+            m.payAfterNum,
+            s.id s_id,
+            s.name s_name,
+            s.sn s_sn,
+            s.price s_price,
+            mem.number mem_number
+        FROM memberpaynumber m LEFT join serve s on m.serve_id = s.id
+          join member mem on m.member_id = mem.id
+        LIMIT #{start}, #{rows}
+    </select>
+
+    <select id="searchMember" resultMap="BaseResultMap">
+        SELECT * FROM memberpaynumber WHERE member_id in (select id
+        from member
+        <where>
+            <if test="keyword!=null">
+                (name like concat("%",#{keyword},"%") or number like concat("%",#{keyword},"%"))
+            </if>
+        </where>
+        )
+    </select>
+    <!--根据卡号查询所需信息-->
+    <select id="listClientItem" resultMap="BaseResultMap">
+        select s.id s_id,s.sn s_sn,s.name s_name,m.payAfterNum payNumber,m.payAfterNum,m.validTime from memberpaynumber m
+          join member mem on m.member_id = mem.id
+            join serve s on m.serve_id = s.id
+          where mem.number = #{clientNumber}
+    </select>
+    <select id="selectNumberBySn" resultType="memberPayNumber">
+        select m.payBeforeNum,m.payAfterNum,m.payNumber from memberpaynumber m
+          join serve s on m.serve_id = s.id
+            join member mem on m.member_id = mem.id
+              where s.sn = #{sn} and mem.number = #{number}
+    </select>
+</mapper>

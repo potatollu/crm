@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.ProductDirMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.ProductDir">
+        <id column="id" property="id"/>
+        <result column="dirName" property="dirName"/>
+        <association property="parent" column="parent_id" javaType="ProductDir" fetchType="eager"
+                     select="selectByPrimaryKey">
+        </association>
+    </resultMap>
+
+    <delete id="deleteByPrimaryKey">
+        delete from productdir
+        where id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into productdir (dirName, parent_id)
+        values (#{dirName}, #{parent.id})
+    </insert>
+    <update id="updateByPrimaryKey">
+        update productdir
+        set dirName = #{dirName},
+        parent_id = #{parent.id}
+        where id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select id, dirName, parent_id
+        from productdir
+        where id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select id, dirName, parent_id
+        from productdir
+    </select>
+
+    <select id="queryForCount" resultType="int">
+        SELECT count(id)
+        FROM productdir
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        SELECT
+            children.id,
+            children.dirName,
+            parent.id      parent_id,
+            parent.dirName parent_dirName
+        FROM productdir children
+            JOIN productdir parent
+                ON children.parent_id = parent.id
+        LIMIT #{start}, #{rows}
+    </select>
+
+    <select id="selectProductDir" resultMap="BaseResultMap">
+        SELECT *
+        FROM productdir
+        WHERE parent_id IS NULL
+    </select>
+    <select id="selectChildren" resultMap="BaseResultMap">
+        SELECT *
+        FROM productdir
+        WHERE parent_id = #{id}
+    </select>
+    <select id="selectByParentId" resultMap="BaseResultMap">
+        select children.id,children.dirName,parent.id parent_id,parent.dirName parent_dirName
+        from productdir children join productdir parent
+        on children.parent_id=parent.id
+        <choose>
+            <when test="firstId == null">
+            </when>
+            <otherwise>
+                where children.parent_id = #{firstId}
+            </otherwise>
+        </choose>
+    </select>
+    <select id="selectDivNameByPid" resultType="string">
+        SELECT pd.dirName
+        FROM productdir pd
+            JOIN product p ON p.dir_id = pd.id
+        WHERE p.id = #{productId}
+    </select>
+</mapper>

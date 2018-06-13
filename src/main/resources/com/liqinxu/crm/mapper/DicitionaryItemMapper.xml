@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.DicitionaryItemMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.DicitionaryItem">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="intro" property="intro" />
+    <!--关联字典表-->
+    <association property="parent" column="parent_id" fetchType="eager" javaType="dicitionary"
+                 select="com.liqinxu.crm.mapper.DicitionaryMapper.selectByPrimaryKey"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from dicitionaryitem
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into dicitionaryitem (parent_id, name, intro)
+    values (#{parent.id}, #{name}, #{intro})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update dicitionaryitem
+    set parent_id = #{parent.id},
+      name = #{name},
+      intro = #{intro}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, parent_id, name, intro
+    from dicitionaryitem
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, parent_id, name, intro
+    from dicitionaryitem
+  </select>
+    <select id="selectBySn" resultMap="BaseResultMap">
+        select item.id,item.parent_id,item.name,item.intro from dicitionaryitem item join dicitionary d on item.parent_id = d.id
+          where d.sn = #{sn}
+    </select>
+</mapper>

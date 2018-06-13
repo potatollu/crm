@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.ConsumptionDetailMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.ConsumptionDetail">
+        <id column="id" property="id"/>
+        <result column="payMoney" property="payMoney"/>
+        <result column="productCount" property="productCount"/>
+        <result column="dealDate" property="dealDate"/>
+        <association property="member" javaType="member" column="member_id"
+                     select="com.liqinxu.crm.mapper.MemberMapper.selectByPrimaryKey" fetchType="eager"/>
+        <association property="product" javaType="product" column="product_id"
+                     select="com.liqinxu.crm.mapper.ProductMapper.selectByPrimaryKey" fetchType="eager"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM consumptiondetail
+        WHERE id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO consumptiondetail (member_id, product_id, payMoney, productCount, dealDate)
+        VALUES (#{member.id}, #{product.id}, #{payMoney}, #{productCount}, #{dealDate})
+    </insert>
+    <update id="updateByPrimaryKey">
+        UPDATE consumptiondetail
+        SET member_id    = #{member.id},
+            product_id   = #{product.id},
+            payMoney     = #{payMoney},
+            productCount = #{productCount},
+            dealDate     = #{dealDate}
+        WHERE id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            id,
+            member_id,
+            product_id,
+            payMoney,
+            productCount,
+            dealDate
+        FROM consumptiondetail
+        WHERE id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            id,
+            member_id,
+            product_id,
+            payMoney,
+            productCount,
+            dealDate
+        FROM consumptiondetail
+    </select>
+    <select id="selectBytotalCount" resultType="int">
+        SELECT COUNT(id)
+        FROM consumptiondetail
+    </select>
+    <select id="selectByMemberCount" resultType="int">
+        SELECT count(DISTINCT member_id)
+        FROM consumptiondetail
+    </select>
+    <select id="selectBytotalExpense" resultType="int">
+        SELECT sum(payMoney)
+        FROM consumptiondetail
+    </select>
+    <select id="selectByTOP3" resultMap="BaseResultMap">
+        SELECT
+            member_id member_id,
+            sum(payMoney) payMoney
+        FROM consumptiondetail
+        GROUP BY member_id
+        ORDER BY sum(payMoney) DESC
+        LIMIT 0, 3
+    </select>
+</mapper>

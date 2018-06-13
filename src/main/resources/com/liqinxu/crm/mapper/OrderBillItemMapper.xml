@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.liqinxu.crm.mapper.OrderBillItemMapper">
+    <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.OrderBillItem">
+        <id column="id" property="id"/>
+        <result column="costPrice" property="costPrice"/>
+        <result column="number" property="number"/>
+        <result column="amount" property="amount"/>
+        <result column="remark" property="remark"/>
+        <result column="bill_id" property="billId"/>
+        <association property="product" javaType="com.liqinxu.crm.domain.Product" columnPrefix="p_">
+            <id column="id" property="id"/>
+            <result column="sn" property="sn"/>
+            <result column="name" property="name"/>
+            <result column="costPrice" property="costPrice"/>
+        </association>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM `orderBillItem`
+        WHERE id = #{id}
+    </delete>
+    <delete id="deleteByBillId">
+        DELETE FROM orderbillitem
+        WHERE bill_id =#{billId}
+    </delete>
+    <insert id="insert" parameterType="com.liqinxu.crm.domain.OrderBillItem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `orderBillItem` (costPrice, number, amount, remark, bill_id,product_id)
+        VALUES (#{costPrice}, #{number}, #{amount}, #{remark}, #{billId}, #{product.id})
+    </insert>
+
+    <select id="selectByBillId" resultMap="BaseResultMap">
+        SELECT
+        item.id,
+        item.costPrice,
+        item.number,
+        item.amount,
+        item.remark,
+        item.bill_id,
+        p.id        p_id,
+        p.name      p_name,
+        p.sn      p_sn,
+        p.costPrice  p_costPrice
+        FROM orderbillitem item
+        JOIN product p
+        ON p.id = item.product_id
+        WHERE item.bill_id =#{billId}
+    </select>
+</mapper>

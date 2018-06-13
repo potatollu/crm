@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liqinxu.crm.mapper.GiftExchangeMapper">
+  <resultMap id="BaseResultMap" type="com.liqinxu.crm.domain.GiftExchange">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="unit" jdbcType="VARCHAR" property="unit" />
+    <result column="number" jdbcType="BIGINT" property="number" />
+    <result column="integral" jdbcType="BIGINT" property="integral" />
+    <result column="integraldate" jdbcType="TIMESTAMP" property="integraldate" />
+      <association property="employee" javaType="com.liqinxu.crm.domain.Employee" columnPrefix="employee_" fetchType="eager">
+          <id column="id" property="id"/>
+          <result column="realname" property="realname"/>
+      </association>
+      <association property="gift" javaType="com.liqinxu.crm.domain.Gift" columnPrefix="gift_" fetchType="eager">
+          <id column="id" property="id"/>
+          <result column="name" property="name"/>
+      </association>
+      <association property="member" javaType="com.liqinxu.crm.domain.Member" columnPrefix="member_" fetchType="eager">
+          <id column="id" property="id"/>
+          <result column="name" property="name"/>
+          <result column="number" property="number"/>
+      </association>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from giftexchange
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.liqinxu.crm.domain.GiftExchange" useGeneratedKeys="true">
+    insert into giftexchange (member_id, gift_id, unit, 
+      number, integral, employee_id, 
+      integraldate)
+    values (#{member.id,jdbcType=BIGINT}, #{gift.id,jdbcType=BIGINT}, #{unit,jdbcType=VARCHAR}, 
+      #{number,jdbcType=BIGINT}, #{integral,jdbcType=BIGINT}, #{employee.id,jdbcType=BIGINT}, 
+      #{integraldate,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.liqinxu.crm.domain.GiftExchange">
+    update giftexchange
+    set member_id = #{member.id,jdbcType=BIGINT},
+      gift_id = #{gift.id,jdbcType=BIGINT},
+      unit = #{unit,jdbcType=VARCHAR},
+      number = #{number,jdbcType=BIGINT},
+      integral = #{integral,jdbcType=BIGINT},
+      employee_id = #{employee.id,jdbcType=BIGINT},
+      integraldate = #{integraldate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+      select
+        ge.id,
+        ge.unit,
+        ge.number,
+        ge.integral,
+        ge.integraldate,
+        e.id employee_id,
+        e.realname employee_realname,
+        m.id member_id,
+        m.name member_name,
+        m.number member_number,
+        g.id gift_id,
+        g.name gift_name
+    from giftexchange ge
+    LEFT JOIN employee e on ge.employee_id = e.id
+    LEFT JOIN member m on ge.member_id = m.id
+    LEFT JOIN gift g on ge.gift_id = g.id
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+      select
+        ge.id,
+        ge.unit,
+        ge.number,
+        ge.integral,
+        ge.integraldate,
+        e.id employee_id,
+        e.realname employee_realname,
+        m.id member_id,
+        m.name member_name,
+        m.number member_number,
+        g.id gift_id,
+        g.name gift_name
+    from giftexchange ge
+    LEFT JOIN employee e on ge.employee_id = e.id
+    LEFT JOIN member m on ge.member_id = m.id
+    LEFT JOIN gift g on ge.gift_id = g.id
+  </select>
+    <select id="queryForCount" resultType="java.lang.Integer">
+          SELECT count(ge.id)
+        from giftexchange ge
+    LEFT JOIN employee e on ge.employee_id = e.id
+    LEFT JOIN member m on ge.member_id = m.id
+    LEFT JOIN gift g on ge.gift_id = g.id
+    </select>
+    <select id="queryForList" resultMap="BaseResultMap">
+        select
+        ge.id,
+        ge.unit,
+        ge.number,
+        ge.integral,
+        ge.integraldate,
+        e.id employee_id,
+        e.realname employee_realname,
+        m.id member_id,
+        m.name member_name,
+        m.number member_number,
+        g.id gift_id,
+        g.name gift_name
+    from giftexchange ge
+    LEFT JOIN employee e on ge.employee_id = e.id
+    LEFT JOIN member m on ge.member_id = m.id
+    LEFT JOIN gift g on ge.gift_id = g.id
+      LIMIT #{start}, #{rows}
+    </select>
+</mapper>
